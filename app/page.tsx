@@ -1,8 +1,8 @@
-import {MacbookScroll} from "@/components/ui/macbook-scroll";
-
+import LandingPage from "@/components/Landing/page"
 export default function Home() {
   return (
     <>
+          <LandingPage/>
     </>
   );
 }
