@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NavbarComponent from "../components/Layout/Navbar"; // Correct path for your new NavbarComponent
-
+import { ThemeProvider } from "@/components/theme-provider";
+import NavbarComponent from "@/components/Layout/Header"; // Correct path for your new NavbarComponent
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -24,10 +24,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head />
       <body className={geistSans.variable}>
-        <NavbarComponent />
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NavbarComponent />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
