@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import {
   motion,
   useScroll,
@@ -7,8 +8,6 @@ import {
   useSpring,
   MotionValue,
 } from "framer-motion";
-
-
 
 export const HeroParallax = ({
   products,
@@ -56,25 +55,25 @@ export const HeroParallax = ({
   );
 
   React.useEffect(() => {
-    let animationFrames: { [key: string]: number } = {};
-    let scrollPositions: { [key: string]: number } = {
+    const animationFrames: { [key: string]: number } = {};
+    const scrollPositions: { [key: string]: number } = {
       row1: 0,
       row2: 0,
       row3: 0,
     };
-    
+
     const startAutoScroll = () => {
       setTimeout(() => {
         const animate = () => {
-          ['row1', 'row2', 'row3'].forEach((rowId) => {
+          ["row1", "row2", "row3"].forEach((rowId) => {
             const row = document.getElementById(rowId);
             if (row) {
               const maxScroll = row.scrollWidth - row.clientWidth;
               if (maxScroll <= 0) return; // Skip if no scrollable content
-              
+
               const speed = 0.5;
-              const isReverse = rowId === 'row1' || rowId === 'row3';
-              
+              const isReverse = rowId === "row1" || rowId === "row3";
+
               if (isReverse) {
                 scrollPositions[rowId] = (scrollPositions[rowId] - speed) % maxScroll;
                 // Handle negative values
@@ -84,41 +83,41 @@ export const HeroParallax = ({
               } else {
                 scrollPositions[rowId] = (scrollPositions[rowId] + speed) % maxScroll;
               }
-              
+
               row.scrollLeft = scrollPositions[rowId];
             }
           });
-          animationFrames['main'] = requestAnimationFrame(animate);
+          animationFrames["main"] = requestAnimationFrame(animate);
         };
-        
+
         animate();
       }, 2000); // Start after initial animation
     };
 
     // Initialize scroll positions to ensure immediate visibility
-    ['row1', 'row2', 'row3'].forEach((rowId) => {
+    ["row1", "row2", "row3"].forEach((rowId) => {
       const row = document.getElementById(rowId);
       if (row) {
         // Allow manual scrolling too
-        row.addEventListener('mouseenter', () => {
-          if (animationFrames['main']) {
-            cancelAnimationFrame(animationFrames['main']);
+        row.addEventListener("mouseenter", () => {
+          if (animationFrames["main"]) {
+            cancelAnimationFrame(animationFrames["main"]);
           }
         });
-        
-        row.addEventListener('mouseleave', () => {
+
+        row.addEventListener("mouseleave", () => {
           // Use the global animate function, not the local one
-          if (!animationFrames['main']) {
+          if (!animationFrames["main"]) {
             const animate = () => {
-              ['row1', 'row2', 'row3'].forEach((id) => {
+              ["row1", "row2", "row3"].forEach((id) => {
                 const r = document.getElementById(id);
                 if (r) {
                   const maxScroll = r.scrollWidth - r.clientWidth;
                   if (maxScroll <= 0) return;
-                  
+
                   const speed = 0.5;
-                  const isRev = id === 'row1' || id === 'row3';
-                  
+                  const isRev = id === "row1" || id === "row3";
+
                   if (isRev) {
                     scrollPositions[id] = (scrollPositions[id] - speed) % maxScroll;
                     if (scrollPositions[id] < 0) {
@@ -127,42 +126,23 @@ export const HeroParallax = ({
                   } else {
                     scrollPositions[id] = (scrollPositions[id] + speed) % maxScroll;
                   }
-                  
+
                   r.scrollLeft = scrollPositions[id];
                 }
               });
-              animationFrames['main'] = requestAnimationFrame(animate);
+              animationFrames["main"] = requestAnimationFrame(animate);
             };
             animate();
           }
         });
-        
-        const animate = () => {
-          const maxScroll = row.scrollWidth - row.clientWidth;
-          if (maxScroll <= 0) return;
-          
-          const speed = 0.5;
-          const isReverse = rowId === 'row1' || rowId === 'row3';
-          
-          if (isReverse) {
-            scrollPositions[rowId] = (scrollPositions[rowId] - speed) % maxScroll;
-            if (scrollPositions[rowId] < 0) {
-              scrollPositions[rowId] = maxScroll + scrollPositions[rowId];
-            }
-          } else {
-            scrollPositions[rowId] = (scrollPositions[rowId] + speed) % maxScroll;
-          }
-          
-          row.scrollLeft = scrollPositions[rowId];
-        };
       }
     });
 
     startAutoScroll();
 
     return () => {
-      if (animationFrames['main']) {
-        cancelAnimationFrame(animationFrames['main']);
+      if (animationFrames["main"]) {
+        cancelAnimationFrame(animationFrames["main"]);
       }
     };
   }, []);
@@ -256,12 +236,13 @@ export const ProductCard = ({
         className="block group-hover/product:shadow-2xl"
       >
         <div className="absolute inset-0 p-4">
-          <img
+          <Image
             src={product.thumbnail}
-            height="600"
-            width="600"
+            height={600}
+            width={600}
             className="object-cover object-left-top h-full w-full border border-neutral-200 dark:border-neutral-800 rounded-lg"
             alt={product.title}
+            priority={false}
           />
         </div>
       </a>
@@ -272,3 +253,4 @@ export const ProductCard = ({
     </motion.div>
   );
 };
+        
