@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import NavbarComponent from "@/components/Layout/Header";
+import Header from "@/components/Layout/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,15 +22,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={geistSans.variable}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NavbarComponent />
+        <Header />
           {children}
-        </ThemeProvider>
+
       </body>
     </html>
   );
