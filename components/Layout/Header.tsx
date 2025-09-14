@@ -4,16 +4,13 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ShoppingCart,
   UserCircle2,
   Facebook,
   Instagram,
   Twitter,
   Linkedin,
   User,
-  Briefcase,
   LogOut,
-  ShieldCheck,
   Moon,
   Sun,
 } from "lucide-react";
@@ -30,7 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import gsap from "gsap";
 
 interface NavItem {
@@ -48,14 +45,12 @@ const navItems: NavItem[] = [
 const Header = () => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartItemsCount, setCartItemsCount] = useState(0);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   // GSAP refs
   const headerRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuItemsRef = useRef<HTMLDivElement>(null);
-  const providerButtonRef = useRef<HTMLDivElement>(null);
   const socialLinksRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,37 +64,12 @@ const Header = () => {
     document.documentElement.classList.toggle("dark");
   };
 
-  const handleHoverScale = (target: HTMLElement) => {
-    gsap.to(target, {
-      scale: 1.1,
-      duration: 0.3,
-      ease: "power2.out",
-    });
-  };
-
-  const handleHoverScaleExit = (target: HTMLElement) => {
-    gsap.to(target, {
-      scale: 1,
-      duration: 0.3,
-      ease: "power2.in",
-    });
-  };
-
-  const handleTapScale = (target: HTMLElement) => {
-    gsap.to(target, {
-      scale: 0.9,
-      duration: 0.3,
-      ease: "power2.out",
-    });
-  };
-
   useEffect(() => {
     if (!mobileMenuRef.current) return;
 
     const menuItems = menuItemsRef.current
       ? Array.from(menuItemsRef.current.children)
       : [];
-    const providerButton = providerButtonRef.current;
     const socialLinks = socialLinksRef.current;
 
     // Set initial states
@@ -114,14 +84,6 @@ const Header = () => {
         opacity: 0,
         x: 50,
         filter: "blur(10px)",
-      });
-    }
-
-    if (providerButton) {
-      gsap.set(providerButton, {
-        opacity: 0,
-        y: 30,
-        scale: 0.9,
       });
     }
 
@@ -157,17 +119,6 @@ const Header = () => {
           "-=0.3"
         )
         .to(
-          providerButton,
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.4,
-            ease: "back.out(1.7)",
-          },
-          "-=0.2"
-        )
-        .to(
           socialLinks,
           {
             opacity: 1,
@@ -188,17 +139,6 @@ const Header = () => {
         duration: 0.3,
         ease: "power2.in",
       })
-        .to(
-          providerButton,
-          {
-            opacity: 0,
-            y: 20,
-            scale: 0.9,
-            duration: 0.3,
-            ease: "power2.in",
-          },
-          "-=0.2"
-        )
         .to(
           menuItems,
           {
@@ -246,63 +186,13 @@ const Header = () => {
               </Link>
             </NavigationMenuItem>
           ))}
-          <NavigationMenuItem>
-            <Link href="/auth/login" legacyBehavior passHref>
-              <NavigationMenuLink
-                className={`font-montserrat text-base tracking-[0.2em] font-medium transition-all duration-300 hover:no-underline relative 
-                text-white dark:text-white
-                before:content-[''] before:absolute before:block before:w-full before:h-[1px] 
-                before:bottom-0 before:left-0 before:bg-white dark:before:bg-white before:scale-x-0 
-                hover:before:scale-x-100 before:transition-transform before:duration-500 
-                before:origin-left before:transform-gpu`}
-              >
-                LOGIN
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <div
-        onClick={() => router.push("/become-provider")}
-        className="cursor-pointer group relative transition-transform duration-300 hover:scale-110"
-      >
-        <Briefcase
-          className="text-white hover:opacity-80 transition-opacity"
-          size={24}
-          strokeWidth={1.5}
-        />
-        <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 pointer-events-none">
-          <div className="bg-white dark:bg-black px-3 py-2 rounded-md shadow-lg border border-black/10 dark:border-white/10 opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap">
-            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rotate-45 bg-white dark:bg-black border-t border-l border-black/10 dark:border-white/10"></div>
-            <span className="text-sm text-black dark:text-white font-medium">
-              Become a Provider
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
   const AuthSection = () => (
     <div className="flex items-center gap-6">
-      {/* Cart Icon with Counter */}
-      <div className="relative">
-        <Link href="/cart">
-          <div className="cursor-pointer">
-            <ShoppingCart
-              className="text-white hover:opacity-80 transition-opacity"
-              size={28}
-              strokeWidth={2}
-            />
-            {cartItemsCount > 0 && (
-              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-in fade-in z-50">
-                {cartItemsCount > 99 ? "99+" : cartItemsCount}
-              </div>
-            )}
-          </div>
-        </Link>
-      </div>
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="cursor-pointer w-8 h-8 rounded-full overflow-hidden border-2 border-white hover:opacity-80 transition-opacity">
@@ -318,36 +208,6 @@ const Header = () => {
           <DropdownMenuItem onClick={() => router.push("/profile")}>
             <User className="mr-2 h-4 w-4" strokeWidth={1.5} />
             Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/services/orders")}>
-            <ShoppingCart className="mr-2 h-4 w-4" strokeWidth={1.5} />
-            Orders
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-default">
-            <svg
-              className="mr-2 h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-              <text
-                x="12"
-                y="16"
-                fontSize="12"
-                fill="currentColor"
-                textAnchor="middle"
-              >
-                ₹
-              </text>
-            </svg>
-            0 coins
           </DropdownMenuItem>
           <DropdownMenuItem onClick={toggleTheme}>
             {theme === "light" ? (
@@ -538,20 +398,6 @@ const Header = () => {
                   </div>
                 </Link>
               </div>
-            </div>
-
-            {/* Provider Button */}
-            <div ref={providerButtonRef} className="mt-8">
-              <Button
-                onClick={() => {
-                  router.push("/become-provider");
-                  setIsMenuOpen(false);
-                }}
-                className="w-full bg-white text-black hover:bg-white/90 font-montserrat text-lg py-6 flex items-center justify-center gap-2"
-              >
-                <Briefcase className="w-5 h-5" />
-                Become a Provider
-              </Button>
             </div>
 
             {/* Social Links */}

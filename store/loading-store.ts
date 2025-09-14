@@ -1,12 +1,11 @@
-import { create } from 'zustand'
-import { StateCreator } from 'zustand'
+import { create } from 'zustand';
 
 interface LoadingState {
-  isLoading: boolean
-  setIsLoading: (loading: boolean) => void
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
-export const useLoadingStore = create<LoadingState>((set: (fn: (state: LoadingState) => LoadingState) => void) => ({
-  isLoading: true,
-  setIsLoading: (loading: boolean) => set((state) => ({ ...state, isLoading: loading })),
-})) 
+export const useLoadingStore = create<LoadingState>((set) => ({
+  isLoading: false,
+  setIsLoading: (isLoading: boolean) => set({ isLoading }),
+}));
