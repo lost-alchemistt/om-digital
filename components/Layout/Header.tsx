@@ -33,11 +33,21 @@ import gsap from "gsap";
 interface NavItem {
   label: string;
   href: string;
+  dropdownItems?: { label: string; href: string }[];
 }
 
 const navItems: NavItem[] = [
   { label: "HOME", href: "/" },
-  { label: "SERVICES", href: "/services" },
+  {
+    label: "SERVICES",
+    href: "/services",
+    dropdownItems: [
+      { label: "Birthday", href: "/services/birthday" },
+      { label: "Wedding", href: "/services/wedding" },
+      { label: "Baby Shower", href: "/services/baby-shower" },
+      { label: "Engagement", href: "/services/engagement" },
+    ],
+  },
   { label: "BLOG", href: "/blog" },
   { label: "CONTACT", href: "/contact" },
 ];
@@ -46,16 +56,18 @@ const Header = () => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
-
-  // GSAP refs
+  const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
+  const [isDesktopServiceOpen, setIsDesktopServiceOpen] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuItemsRef = useRef<HTMLDivElement>(null);
   const socialLinksRef = useRef<HTMLDivElement>(null);
+  const serviceDropdownRef = useRef<HTMLLIElement>(null); // Change type to HTMLLIElement
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? "dark" : "light");
+    // Force dark mode by default
+    document.documentElement.classList.add("dark");
+    setTheme("dark");
   }, []);
 
   const toggleTheme = () => {
@@ -166,24 +178,82 @@ const Header = () => {
     }
   }, [isMenuOpen]);
 
+  // Add click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        serviceDropdownRef.current &&
+        !serviceDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDesktopServiceOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const DesktopProfile = () => (
     <div className="flex items-center space-x-8">
       <NavigationMenu>
         <NavigationMenuList className="flex gap-8">
           {navItems.map((item) => (
-            <NavigationMenuItem key={item.label}>
-              <Link href={item.href} legacyBehavior passHref>
+            <NavigationMenuItem
+              key={item.label}
+              className="relative"
+              ref={item.label === "SERVICES" ? serviceDropdownRef : undefined} // Change null to undefined
+            >
+              <div
+                onClick={() => {
+                  if (item.label === "SERVICES") {
+                    setIsDesktopServiceOpen(!isDesktopServiceOpen);
+                  } else {
+                    router.push(item.href);
+                  }
+                }}
+              >
                 <NavigationMenuLink
                   className={`font-montserrat text-base tracking-[0.2em] font-medium transition-all duration-300 hover:no-underline relative 
-                  text-white dark:text-white
+                  text-white dark:text-white cursor-pointer
                   before:content-[''] before:absolute before:block before:w-full before:h-[1px] 
                   before:bottom-0 before:left-0 before:bg-white dark:before:bg-white before:scale-x-0 
                   hover:before:scale-x-100 before:transition-transform before:duration-500 
                   before:origin-left before:transform-gpu`}
                 >
                   {item.label}
+                  {item.label === "SERVICES" && (
+                    <svg
+                      className={`inline-block ml-2 w-4 h-4 transform transition-transform ${
+                        isDesktopServiceOpen ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  )}
                 </NavigationMenuLink>
-              </Link>
+              </div>
+              {item.label === "SERVICES" && item.dropdownItems && isDesktopServiceOpen && (
+                <div className="absolute left-0 mt-2 w-48 bg-black dark:bg-black border border-white/10 rounded-md shadow-lg z-50">
+                  {item.dropdownItems.map((dropdownItem) => (
+                    <Link
+                      key={dropdownItem.label}
+                      href={dropdownItem.href}
+                      onClick={() => setIsDesktopServiceOpen(false)}
+                      className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors duration-200"
+                    >
+                      {dropdownItem.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </NavigationMenuItem>
           ))}
         </NavigationMenuList>
@@ -324,26 +394,28 @@ const Header = () => {
             <div className="space-y-0" ref={menuItemsRef}>
               {navItems.map((item, index) => (
                 <div key={item.label} className="opacity-0">
-                  <Link
-                    href={item.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="group block"
-                  >
-                    <div className="relative py-5 px-8">
-                      {/* Background hover effect */}
+                  <div className="group block">
+                    <div
+                      className="relative py-5 px-8 cursor-pointer"
+                      onClick={() => {
+                        if (item.label === "SERVICES") {
+                          setIsServiceDropdownOpen(!isServiceDropdownOpen);
+                        } else {
+                          router.push(item.href);
+                          setIsMenuOpen(false);
+                        }
+                      }}
+                    >
                       <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-2" />
-
-                      {/* Menu item content */}
                       <div className="relative flex items-center justify-between">
-                        {/* Text */}
                         <span className="text-4xl font-montserrat text-white/80 group-hover:text-white transition-all duration-300 transform group-hover:translate-x-2">
                           {item.label}
                         </span>
-
-                        {/* Arrow indicator */}
-                        <div className="opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                        {item.label === "SERVICES" && (
                           <svg
-                            className="w-6 h-6 text-white/70"
+                            className={`w-6 h-6 text-white/70 transition-transform duration-300 ${
+                              isServiceDropdownOpen ? "rotate-180" : ""
+                            }`}
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -352,14 +424,29 @@ const Header = () => {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M9 5l7 7-7 7"
+                              d="M19 9l-7 7-7-7"
                             />
                           </svg>
-                        </div>
+                        )}
                       </div>
                     </div>
-                  </Link>
-                  {/* Divider - only show between items */}
+                    {item.label === "SERVICES" &&
+                      item.dropdownItems &&
+                      isServiceDropdownOpen && (
+                        <div className="bg-white/5 rounded-lg mx-8 mb-4">
+                          {item.dropdownItems.map((dropdownItem) => (
+                            <Link
+                              key={dropdownItem.label}
+                              href={dropdownItem.href}
+                              onClick={() => setIsMenuOpen(false)}
+                              className="block px-6 py-3 text-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-200"
+                            >
+                              {dropdownItem.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                  </div>
                   {index < navItems.length - 1 && (
                     <div className="mx-8">
                       <div className="h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
