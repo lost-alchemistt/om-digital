@@ -299,10 +299,10 @@ const Header = () => {
   return (
     <header
       ref={headerRef}
-      className="fixed top-0 w-full z-50 bg-black dark:bg-black"
+      className="fixed top-0 w-full z-50 bg-black dark:bg-black "
     >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-24">
+      <div className="container mx-auto px-4 ">
+        <div className="flex items-center justify-between h-14 md:h-24 ">
           {/* Mobile Layout */}
           <div className="flex items-center justify-between w-full md:hidden">
             <button
@@ -380,7 +380,7 @@ const Header = () => {
       {/* Mobile Menu */}
       <div
         ref={mobileMenuRef}
-        className="fixed left-0 right-0 top-24 h-[calc(100vh-6rem)] bg-gradient-to-b from-black via-black/95 to-black/90 backdrop-blur-lg border-t border-white/10 shadow-2xl md:hidden overflow-y-auto"
+        className="fixed left-0 right-0 top-16 md:top-24 h-[calc(100vh-4rem)] md:h-[calc(100vh-6rem)] bg-gradient-to-b from-black via-black/95 to-black/90 backdrop-blur-lg border-t border-white/10 shadow-2xl md:hidden overflow-y-auto"
         style={{ display: "none" }}
       >
         <div className="max-w-7xl mx-auto px-6 py-12">
