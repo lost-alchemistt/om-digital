@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, memo, useEffect } from "react";
+import React, { useState, useCallback, memo } from "react";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -179,7 +179,6 @@ export default function LoginForm() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [needsProfile, setNeedsProfile] = useState(false);
-  const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [referralCode, setReferralCode] = useState('');
 
   const handleLoginChange = useCallback(
@@ -192,8 +191,10 @@ export default function LoginForm() {
   );
 
   const handleUserDataChange = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
+      setUserData(prev => ({ ...prev, [name]: value }));
+      setError("");
     },
     []
   );
@@ -263,7 +264,7 @@ export default function LoginForm() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`
@@ -323,11 +324,11 @@ export default function LoginForm() {
       } else {
         router.push("/");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (needsProfile) {
-        setError(err.message || "Failed to save profile");
+        setError(err instanceof Error ? err.message : "Failed to save profile");
       } else {
-        setError(err.message || "Failed to log in");
+        setError(err instanceof Error ? err.message : "Failed to log in");
       }
     } finally {
       setLoading(false);
@@ -472,7 +473,7 @@ export default function LoginForm() {
         {!needsProfile && (
           <CardFooter className="flex flex-col sm:flex-row justify-between gap-4 border-t pt-6">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link 
                 href="/auth/signup" 
                 className="text-primary hover:underline font-medium"

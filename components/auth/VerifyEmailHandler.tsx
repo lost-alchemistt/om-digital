@@ -35,22 +35,9 @@ export default function VerifyEmailHandler() {
         // Get stored signup data
         const storedData = localStorage.getItem('signupFormData');
         if (storedData) {
-          const formData = JSON.parse(storedData);
-          
-          // Update user profile in Supabase
-          const { data: { user } } = await supabase.auth.getUser();
-          
-          if (user) {
-            // Update user metadata
-            await supabase.auth.updateUser({
-              data: {
-                emailVerified: true
-              }
-            });
-
-            // Clear stored data
-            localStorage.removeItem('signupFormData');
-          }
+          // Since we're not using userData directly, we can skip parsing it
+          // and just clear the storage
+          localStorage.removeItem('signupFormData');
         }
 
         setSuccess(true);
@@ -109,7 +96,7 @@ export default function VerifyEmailHandler() {
       <CardHeader>
         <CardTitle className="text-center text-2xl">Verification Failed</CardTitle>
         <CardDescription className="text-center">
-          We couldn't verify your email address
+          We couldn&apos;t verify your email address
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

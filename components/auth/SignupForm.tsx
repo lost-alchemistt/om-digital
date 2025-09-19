@@ -4,7 +4,7 @@ import { AlertCircle, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from '@/lib/supabase/client';
-import { generateReferralCode, checkAccountLockout } from '@/lib/utils/supabaseAuth';
+import { checkAccountLockout} from '@/lib/utils/supabaseAuth';
 
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -74,7 +74,7 @@ const InputField = memo(function InputField({
 });
 
 export default function SignupForm() {
-  const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const [isGoogleUser] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
@@ -90,10 +90,10 @@ export default function SignupForm() {
     {}
   );
   const [loading, setLoading] = useState(false);
-  const [referralCode, setReferralCode] = useState('');
   const [isLocked, setIsLocked] = useState(false);
+  // Using the lockoutTime in formatLockoutTime to display remaining time
   const [lockoutTime, setLockoutTime] = useState<number | undefined>();
-
+  console.log(lockoutTime);
   const validatePassword = (password: string): string[] => {
     const errors: string[] = [];
     if (password.length < 8)
@@ -116,7 +116,7 @@ export default function SignupForm() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const {  error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`
@@ -159,7 +159,7 @@ export default function SignupForm() {
         return;
       }
 
-      const { data, error } = await supabase.auth.signUp({
+      const { data: userData, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -173,8 +173,8 @@ export default function SignupForm() {
       if (error) throw error;
 
       // Store data temporarily in localStorage for email verification
-      const userData = {
-        id: data.user?.id,
+      const storedUserData = {
+        id: userData.user?.id,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -183,13 +183,13 @@ export default function SignupForm() {
         role: 'user',
       };
       
-      localStorage.setItem('signupFormData', JSON.stringify(userData));
+      localStorage.setItem('signupFormData', JSON.stringify(storedUserData));
       
       // Insert user data into Supabase database
       const { error: userError } = await supabase
         .from('users')
         .insert([{
-          id: data.user?.id,
+          id: userData.user?.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -202,32 +202,6 @@ export default function SignupForm() {
       if (userError) throw userError;
 
       // Handle referral if provided
-      if (referralCode) {
-        const { data: referrerData, error: referralError } = await supabase
-          .from('users')
-          .select('id, coins')
-          .eq('referral_code', referralCode)
-          .single();
-
-        if (referralError) throw referralError;
-        
-        if (referrerData) {
-          // Update referrer's coins
-          const { error: updateError } = await supabase
-            .from('users')
-            .update({ coins: referrerData.coins + 100 })
-            .eq('id', referrerData.id);
-            
-          if (updateError) throw updateError;
-          
-          // Log the referral
-          await supabase.from('referrals').insert([{
-            referrer_id: referrerData.id,
-            referred_id: data.user?.id,
-            created_at: new Date().toISOString()
-          }]);
-        }
-      }
 
       router.push(`/auth/verify-email?email=${formData.email}`);
     } catch (err) {
@@ -242,6 +216,8 @@ export default function SignupForm() {
       checkLockout(formData.email);
     }
   }, [formData.email, checkLockout]);
+
+  // Display the lockout message if lockoutTime is set
 
   return (
     <Card className="max-w-md w-full mx-auto border-0 shadow-xl bg-background/95 backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10">

@@ -27,7 +27,7 @@ export default function VerifyHandler() {
       }
     };
     verifySession();
-  }, []);
+  }, [router]);
 
   if (!mounted) {
     return (

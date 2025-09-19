@@ -46,6 +46,7 @@ export default function ResetPasswordForm() {
         setEmail("Your account"); // Placeholder since Supabase doesn't expose this
         setValidatingCode(false);
       } catch (err) {
+        console.log(err);
         setError("This password reset link is invalid or has expired");
         setValidatingCode(false);
       }

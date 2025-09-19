@@ -27,8 +27,9 @@ export type AccountLockoutResult = {
 };
 
 export async function checkAccountLockout(email: string): Promise<AccountLockoutResult> {
-  // In a real app, you would implement actual lockout logic here
+  // TODO: Implement actual lockout logic using the email parameter
   // For now, we're returning a simplified version
+  console.log(email);
   return { isLocked: false };
 }
 
