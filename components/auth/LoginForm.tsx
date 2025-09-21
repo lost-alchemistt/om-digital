@@ -179,7 +179,6 @@ export default function LoginForm() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [needsProfile, setNeedsProfile] = useState(false);
-  const [referralCode, setReferralCode] = useState('');
 
   const handleLoginChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -229,29 +228,6 @@ export default function LoginForm() {
       }]);
     
     if (error) throw error;
-    
-    if (referralCode) {
-      const { data: referrerData, error: referralError } = await supabase
-        .from('users')
-        .select('id, coins')
-        .eq('referral_code', referralCode)
-        .single();
-      
-      if (!referralError && referrerData) {
-        // Update referrer's coins
-        await supabase
-          .from('users')
-          .update({ coins: referrerData.coins + 100 })
-          .eq('id', referrerData.id);
-        
-        // Log the referral
-        await supabase.from('referrals').insert([{
-          referrer_id: referrerData.id,
-          referred_id: uid,
-          created_at: new Date().toISOString()
-        }]);
-      }
-    }
 
     // Update user metadata
     await supabase.auth.updateUser({
@@ -439,18 +415,6 @@ export default function LoginForm() {
                   onGenderChange={handleGenderChange}
                 />
 
-                <div className="space-y-2">
-                  <Label htmlFor="referralCode">Have a referral code?</Label>
-                  <Input
-                    id="referralCode"
-                    name="referralCode"
-                    value={referralCode}
-                    onChange={(e) => setReferralCode(e.target.value)}
-                    placeholder="Enter referral code (optional)"
-                    className="h-10"
-                  />
-                </div>
-                
                 <Button 
                   type="submit" 
                   className="w-full h-11 text-base font-semibold" 

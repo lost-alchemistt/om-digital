@@ -302,7 +302,7 @@ const Header = () => {
       className="fixed top-0 w-full z-50 bg-black dark:bg-black "
     >
       <div className="container mx-auto px-4 ">
-        <div className="flex items-center justify-between h-14 md:h-24 ">
+        <div className="flex items-center justify-between h-14 md:h-20 ">
           {/* Mobile Layout */}
           <div className="flex items-center justify-between w-full md:hidden">
             <button
@@ -353,7 +353,7 @@ const Header = () => {
           </div>
 
           {/* Desktop Layout */}
-          <div className="hidden md:flex items-center justify-between w-full">
+          <div className="hidden md:flex items-center justify-between w-full ">
             <Link href="/" className="relative">
               <div className="transition-transform duration-300 hover:scale-110">
                 <Image

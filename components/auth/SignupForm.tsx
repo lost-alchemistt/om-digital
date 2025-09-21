@@ -4,7 +4,7 @@ import { AlertCircle, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from '@/lib/supabase/client';
-import { checkAccountLockout} from '@/lib/utils/supabaseAuth';
+import { checkAccountLockout } from '@/lib/utils/supabaseAuth';
 
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Label } from "@/components/ui/label";  
+import { Label } from "@/components/ui/label";
 interface FormData {
   firstName: string;
   lastName: string;
@@ -116,7 +116,7 @@ export default function SignupForm() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const {  error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`
@@ -146,69 +146,73 @@ export default function SignupForm() {
     setLoading(true);
 
     try {
+      // Form validation
+      if (!formData.firstName || !formData.lastName || !formData.email || !formData.gender) {
+        setError("Please fill in all required fields");
+        return;
+      }
+
+      // Password validation
       if (!formData.password || formData.password !== formData.confirmPassword) {
         setError("Passwords do not match");
-        setLoading(false);
         return;
       }
 
       const passwordErrors = validatePassword(formData.password);
       if (passwordErrors.length > 0) {
         setValidationErrors({ password: passwordErrors });
-        setLoading(false);
         return;
       }
 
-      const { data: userData, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-          },
-        }
-      });
+      // Sign up process
+      // components/auth/SignupForm.tsx
 
-      if (error) throw error;
+      // ... inside your handleSubmit function
 
-      // Store data temporarily in localStorage for email verification
-      const storedUserData = {
-        id: userData.user?.id,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        mobile: formData.mobile,
-        gender: formData.gender,
-        role: 'user',
-      };
-      
-      localStorage.setItem('signupFormData', JSON.stringify(storedUserData));
-      
-      // Insert user data into Supabase database
-      const { error: userError } = await supabase
-        .from('users')
-        .insert([{
-          id: userData.user?.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
+      try {
+        // Sign up process
+        const { data, error } = await supabase.auth.signUp({
           email: formData.email,
-          mobile: formData.mobile,
-          gender: formData.gender,
-          role: 'user',
-          coins: 1000,
-        }]);
+          password: formData.password,
+          options: {
+            data: {
+              // This data will be available in your SQL trigger
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              // You can add other metadata here if needed
+            },
+          },
+        });
 
-      if (userError) throw userError;
+        if (error) {
+          console.error('Signup error:', error);
+          throw error;
+        }
 
-      // Handle referral if provided
+        if (!data?.user) {
+          throw new Error('No user data returned after signup');
+        }
 
-      router.push(`/auth/verify-email?email=${formData.email}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create account");
-    } finally {
-      setLoading(false);
-    }
+        // 🎉 YOU CAN NOW DELETE THE ENTIRE 'supabase.from('users').insert(...)' BLOCK!
+        // The SQL trigger you created handles profile creation automatically.
+
+        // No need to store temporary data in localStorage anymore
+        // localStorage.removeItem('signupFormData'); 
+
+        // Redirect to verification page
+        router.push(`/auth/verify-email?email=${formData.email}`);
+
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError('An unexpected error occurred');
+        }
+        console.error('Error details:', error);
+      } 
+    }finally {
+        setLoading(false);
+      }
   };
 
   useEffect(() => {
@@ -274,37 +278,37 @@ export default function SignupForm() {
                   disabled={true}
                 />
 
-                <InputField 
-                  name="mobile" 
-                  label="Mobile Number" 
+                <InputField
+                  name="mobile"
+                  label="Mobile Number"
                   type="tel"
                   value={formData.mobile}
                   onChange={(e) => handleChange(e.target.name as keyof FormData, e.target.value)}
                 />
 
 
-                  <div className="space-y-2">
-                    <Label htmlFor="gender" className="text-sm font-medium">
-                      Gender<span className="text-destructive">*</span>
-                    </Label>
-                    <Select
-                      value={formData.gender}
-                      onValueChange={(value) => handleChange("gender", value)}
-                    >
-                      <SelectTrigger className="h-10">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gender" className="text-sm font-medium">
+                    Gender<span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.gender}
+                    onValueChange={(value) => handleChange("gender", value)}
+                  >
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              <Button 
-                type="submit" 
-                className="w-full h-11" 
+              </div>
+              <Button
+                type="submit"
+                className="w-full h-11"
                 disabled={loading || isLocked}
               >
                 {loading ? (
@@ -346,9 +350,9 @@ export default function SignupForm() {
 
                 {!isGoogleUser && (
                   <>
-                    <InputField 
-                      name="password" 
-                      label="Password" 
+                    <InputField
+                      name="password"
+                      label="Password"
                       type="password"
                       value={formData.password}
                       onChange={(e) => handleChange(e.target.name as keyof FormData, e.target.value)}
@@ -363,15 +367,15 @@ export default function SignupForm() {
                   </>
                 )}
 
-                <InputField 
-                  name="mobile" 
-                  label="Mobile Number" 
+                <InputField
+                  name="mobile"
+                  label="Mobile Number"
                   type="tel"
                   value={formData.mobile}
                   onChange={(e) => handleChange(e.target.name as keyof FormData, e.target.value)}
                 />
 
-                
+
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -425,9 +429,9 @@ export default function SignupForm() {
               )}
 
               <div className="flex flex-col gap-4 pt-2">
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 text-base font-semibold" 
+                <Button
+                  type="submit"
+                  className="w-full h-11 text-base font-semibold"
                   disabled={loading || isLocked || (!isGoogleUser && !formData.email) || (!isGoogleUser && !formData.password)}
                 >
                   {loading ? (
@@ -491,8 +495,8 @@ export default function SignupForm() {
         <CardFooter className="flex justify-center border-t pt-6">
           <p className="text-xs sm:text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link 
-              href="/auth/login" 
+            <Link
+              href="/auth/login"
               className="text-primary hover:underline font-medium"
             >
               Sign in
