@@ -5,151 +5,160 @@ import { HeroParallax } from '../ui/hero-parallax'
 
 const LandingPage = () => {
   const products = [
+    // Folder 1 - 4 images
     {
-      title: "Moonbeam",
-      link: "/projects/moonbeam",
-      thumbnail: "/images/projects/moonbeam.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/1/1.jpg"
     },
     {
-      title: "Horizon",
-      link: "/projects/horizon",
-      thumbnail: "/images/projects/horizon.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/1/2.jpg"
     },
     {
-      title: "Genesis",
-      link: "/projects/genesis",
-      thumbnail: "/images/projects/genesis.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/1/3.jpg"
     },
     {
-      title: "Quantum",
-      link: "/projects/quantum",
-      thumbnail: "/images/projects/quantum.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/1/4.jpg"
+    },
+    // Folder 2 - 4 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/2/1.jpg"
     },
     {
-      title: "Nebula",
-      link: "/projects/nebula",
-      thumbnail: "/images/projects/nebula.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/2/2.jpg"
     },
     {
-      title: "Cosmos",
-      link: "/projects/cosmos",
-      thumbnail: "/images/projects/cosmos.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/2/3.jpg"
     },
     {
-      title: "Infinity",
-      link: "/projects/infinity",
-      thumbnail: "/images/projects/infinity.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/2/4.jpg"
+    },
+    // Folder 3 - 2 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/3/1.jpg"
     },
     {
-      title: "Matrix",
-      link: "/projects/matrix",
-      thumbnail: "/images/projects/matrix.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/3/2.jpg"
+    },
+    // Folder 4 - 3 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/4/1.jpg"
     },
     {
-      title: "Prism",
-      link: "/projects/prism",
-      thumbnail: "/images/projects/prism.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/4/2.jpg"
     },
     {
-      title: "Eclipse",
-      link: "/projects/eclipse",
-      thumbnail: "/images/projects/eclipse.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/4/3.jpg"
+    },
+    // Folder 5 - 3 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/5/1.jpg"
     },
     {
-      title: "Stellar",
-      link: "/projects/stellar",
-      thumbnail: "/images/projects/stellar.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/5/2.jpg"
     },
     {
-      title: "Nexus",
-      link: "/projects/nexus",
-      thumbnail: "/images/projects/nexus.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/5/3.jpg"
+    },
+    // Folder 6 - 3 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/6/1.jpg"
     },
     {
-      title: "Zenith",
-      link: "/projects/zenith",
-      thumbnail: "/images/projects/zenith.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/6/2.jpg"
     },
     {
-      title: "Spectrum",
-      link: "/projects/spectrum",
-      thumbnail: "/images/projects/spectrum.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/6/3.jpg"
+    },
+    // Folder 7 - 2 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/7/1.jpg"
     },
     {
-      title: "Catalyst",
-      link: "/projects/catalyst",
-      thumbnail: "/images/projects/catalyst.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/7/2.jpg"
+    },
+    // Folder 8 - 2 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/8/1.jpg"
     },
     {
-      title: "Aurora",
-      link: "/projects/aurora",
-      thumbnail: "/images/projects/aurora.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/8/2.jpg"
+    },
+    // Folder 9 - 3 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/9/1.jpg"
     },
     {
-      title: "Pulse",
-      link: "/projects/pulse",
-      thumbnail: "/images/projects/pulse.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/9/2.jpg"
     },
     {
-      title: "Fusion",
-      link: "/projects/fusion",
-      thumbnail: "/images/projects/fusion.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/9/3.jpg"
+    },
+    // Folder 10 - 3 images
+    {
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/10/1.jpg"
     },
     {
-      title: "Vertex",
-      link: "/projects/vertex",
-      thumbnail: "/images/projects/vertex.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/10/2.jpg"
     },
     {
-      title: "Nova",
-      link: "/projects/nova",
-      thumbnail: "/images/projects/nova.jpg"
-    },
-    {
-      title: "Synthesis",
-      link: "/projects/synthesis",
-      thumbnail: "/images/projects/synthesis.jpg"
-    },
-    {
-      title: "Parallel",
-      link: "/projects/parallel",
-      thumbnail: "/images/projects/parallel.jpg"
-    },
-    {
-      title: "Element",
-      link: "/projects/element",
-      thumbnail: "/images/projects/element.jpg"
-    },
-    {
-      title: "Circuit",
-      link: "/projects/circuit",
-      thumbnail: "/images/projects/circuit.jpg"
-    }
-    ,
-    {
-      title: "Nova",
-      link: "/projects/nova",
-      thumbnail: "/images/projects/nova.jpg"
-    },
-    {
-      title: "Synthesis",
-      link: "/projects/synthesis",
-      thumbnail: "/images/projects/synthesis.jpg"
-    },
-    {
-      title: "Parallel",
-      link: "/projects/parallel",
-      thumbnail: "/images/projects/parallel.jpg"
-    },
-    {
-      title: "Element",
-      link: "/projects/element",
-      thumbnail: "/images/projects/element.jpg"
-    },
-    {
-      title: "Circuit",
-      link: "/projects/circuit",
-      thumbnail: "/images/projects/circuit.jpg"
+      title: "",
+      link: "/services",
+      thumbnail: "/pdf/10/3.jpg"
     }
   ];
 
