@@ -62,6 +62,10 @@ const InputField = memo(function InputField({
   );
 });
 
+// Add error type definitions
+type AuthError = {
+  message: string;
+};
 
 export default function LoginForm() {
   const [loginData, setLoginData] = useState<LoginData>({
@@ -89,8 +93,9 @@ export default function LoginForm() {
         }
       });
       if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || "An error occurred with Google sign-in");
+    } catch (error: unknown) {
+      const authError = error as AuthError;
+      setError(authError.message || "An error occurred with Google sign-in");
     }
   };
 
@@ -106,7 +111,6 @@ export default function LoginForm() {
       });
 
       if (error) {
-        // This will now catch specific auth errors like "Invalid login credentials"
         throw error;
       }
       
@@ -114,8 +118,9 @@ export default function LoginForm() {
       // No need to check for it here. Just redirect.
       window.location.href = "/";
 
-    } catch (err: any) {
-      setError(err.message || "Failed to log in. Please check your credentials.");
+    } catch (error: unknown) {
+      const authError = error as AuthError;
+      setError(authError.message || "Failed to log in. Please check your credentials.");
     } finally {
       setLoading(false);
     }
