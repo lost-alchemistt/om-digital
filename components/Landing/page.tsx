@@ -1,6 +1,5 @@
 'use client'
 import React from 'react'
-import { DraggableCardDemo } from './draggable-card-demo'
 import { HeroParallax } from '../ui/hero-parallax'
 
 const LandingPage = () => {
@@ -165,7 +164,6 @@ const LandingPage = () => {
   return (
     <div>
       <HeroParallax products={products} />
-      <DraggableCardDemo />
     </div>
   );
 };
