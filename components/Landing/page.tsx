@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { HeroParallax } from '../ui/hero-parallax'
+import WhatsAppFloat from '../ui/whatsapp-float'
 
 const LandingPage = () => {
   const products = [
@@ -164,6 +165,12 @@ const LandingPage = () => {
   return (
     <div>
       <HeroParallax products={products} />
+      <WhatsAppFloat 
+        phoneNumber="917600107620"
+        message="Hi! I need help with a video invite"
+        companyName="Omdigital"
+        logoUrl="/images/logo.png"
+      />
     </div>
   );
 };
