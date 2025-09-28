@@ -14,8 +14,8 @@ interface WhatsAppFloatProps {
 export default function WhatsAppFloat({ 
   phoneNumber, 
   message = "Hi! I need help with a video invite",
-  companyName = "Support",
-  logoUrl = "/images/logo.png"
+  companyName = "OM Digital",
+  logoUrl = "/images/logo2.png" // Updated default path for the logo
 }: WhatsAppFloatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
@@ -48,8 +48,10 @@ export default function WhatsAppFloat({
             <div className="flex items-center">
               <Image 
                 src={logoUrl} 
-                alt="Support" 
-                className="w-10 h-10 rounded-full object-cover"
+                alt={companyName} 
+                width={50}
+                height={40}
+                className="h-10 w-auto object-contain" // Adjusted for better logo display
               />
               <div className="ml-3 font-semibold">{companyName}</div>
             </div>

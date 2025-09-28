@@ -10,9 +10,7 @@ const InvitationScroller: React.FC = () => {
   const youtubeShorts = [
     'qn6QaXzvFcQ',
     'knmzNWlzGg8',
-    '0IUFkh5saF4',
-    'n2DLaZVhb2o',
-    'KMb9ReBrgIc'
+    '0IUFkh5saF4'
   ];
 
   // Sample data for the cards using your PDF folder images
@@ -21,7 +19,7 @@ const InvitationScroller: React.FC = () => {
       id: 'AI-1372',
       title: 'MAYRA CEREMONY ',
       imageUrl: '/pdf/1/1.jpg',
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[0]}`,
+      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
       originalPrice: 799,
       discountedPrice: 399,
       discountPercentage: 50
@@ -30,7 +28,7 @@ const InvitationScroller: React.FC = () => {
       id: 'AI-1373',
       title: 'WEDDING CEREMONY ',
       imageUrl: '/pdf/2/1.jpg',
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[1]}`,
+      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
       originalPrice: 799,
       discountedPrice: 399,
       discountPercentage: 50
@@ -48,7 +46,7 @@ const InvitationScroller: React.FC = () => {
       id: 'AI-1375',
       title: 'RECEPTION CEREMONY ',
       imageUrl: '/pdf/4/1.jpg',
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[3]}`,
+      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
       originalPrice: 799,
       discountedPrice: 399,
       discountPercentage: 50
@@ -91,7 +89,7 @@ const InvitationScroller: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-12">
           <motion.div variants={titleVariants} className="relative">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
+            <h2 className="text-3xl md:text-4xl font-bold dark:text-white text-black">
               Wedding Invitation Cards
             </h2>
             <motion.div 
@@ -108,7 +106,7 @@ const InvitationScroller: React.FC = () => {
           >
             <Link 
               href="services/wedding" 
-              className="text-white hover:text-purple-300 transition-colors duration-300 flex items-center gap-2 group"
+              className="dark:text-white text-black hover:text-purple-300 transition-colors duration-300 flex items-center gap-2 group"
             >
               <span>View All</span>
               <motion.div
@@ -168,7 +166,7 @@ const InvitationScroller: React.FC = () => {
           className="mt-10 text-center"
           variants={titleVariants}
         >
-          <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+          <p className="dark:text-gray-400 text-black mb-6 max-w-2xl mx-auto">
             Explore our stunning collection of digital invitations for all occasions. Customize your perfect invitation today!
           </p>
           <Link href="/contact" className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-3 px-6 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all hover:scale-105">

@@ -117,16 +117,16 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
         <p className="text-xs text-center text-black dark:text-white mb-2">Easily Send Via</p>
         <div className="flex justify-center space-x-4">
           <motion.div whileHover={{ scale: 1.2, color: "#1877F2" }}>
-            <Facebook className="w-5 h-5 text-black dark:text-white hover:text-blue-500 cursor-pointer" />
+            <Facebook className="w-5 h-5 text-black dark:text-white dark:hover:text-blue-500 cursor-pointer" />
           </motion.div>
           <motion.div whileHover={{ scale: 1.2, color: "#E4405F" }}>
-            <Instagram className="w-5 h-5 text-black dark:text-white hover:text-pink-500 cursor-pointer" />
+            <Instagram className="w-5 h-5 text-black dark:text-white dark:hover:text-pink-500 cursor-pointer" />
           </motion.div>
           <motion.div whileHover={{ scale: 1.2, color: "#25D366" }}>
-            <MessageCircle className="w-5 h-5 text-black dark:text-white hover:text-green-500 cursor-pointer" />
+            <MessageCircle className="w-5 h-5 text-black dark:text-white dark:hover:text-green-500 cursor-pointer" />
           </motion.div>
           <motion.div whileHover={{ scale: 1.2 }}>
-            <Share className="w-5 h-5 text-black dark:text-white hover:text-black cursor-pointer" />
+            <Share className="w-5 h-5 text-black dark:text-white dark:hover:text-black cursor-pointer" />
           </motion.div>
         </div>
       </div>
