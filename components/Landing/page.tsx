@@ -2,8 +2,8 @@
 import React from "react";
 import { HeroParallax } from "../ui/hero-parallax";
 import WhatsAppFloat from "../ui/whatsapp-float";
-import InvitationScroller from "../Sections/InvitationScroller";
-
+import InvitationScroller from "../Sections/WeddingScrollar";
+import BirthdayScrollar from "../Sections/Birthday";
 const LandingPage = () => {
   const products = [
     // Folder 1 - 4 images
@@ -167,6 +167,7 @@ const LandingPage = () => {
     <div>
       <HeroParallax products={products} />
       <InvitationScroller />
+      <BirthdayScrollar />
       <WhatsAppFloat
         phoneNumber="917600107620"
         message="Hi! I need help with a video invite"

@@ -13,12 +13,15 @@ const InvitationScroller: React.FC = () => {
     '0IUFkh5saF4'
   ];
 
-  // Sample data for the cards using your PDF folder images
+  // Supabase storage URL prefix for your bucket and folder
+  const supabaseStorageUrl = 'https://fgwmzwguyklmonwgzxop.supabase.co/storage/v1/object/public/Photos/Wedding';
+
+  // Sample data for the cards using Supabase storage images
   const invitationData = [
     {
       id: 'AI-1372',
       title: 'MAYRA CEREMONY ',
-      imageUrl: '/pdf/1/1.jpg',
+      imageUrl: `${supabaseStorageUrl}/1.jpg`,
       videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
       originalPrice: 799,
       discountedPrice: 399,
@@ -27,7 +30,7 @@ const InvitationScroller: React.FC = () => {
     {
       id: 'AI-1373',
       title: 'WEDDING CEREMONY ',
-      imageUrl: '/pdf/2/1.jpg',
+      imageUrl: `${supabaseStorageUrl}/3.jpg`,
       videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
       originalPrice: 799,
       discountedPrice: 399,
@@ -36,7 +39,7 @@ const InvitationScroller: React.FC = () => {
     {
       id: 'AI-1374',
       title: 'ENGAGEMENT CEREMONY ',
-      imageUrl: '/pdf/3/1.jpg',
+      imageUrl: `${supabaseStorageUrl}/4.jpg`,
       videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
       originalPrice: 799,
       discountedPrice: 399,
@@ -45,7 +48,7 @@ const InvitationScroller: React.FC = () => {
     {
       id: 'AI-1375',
       title: 'RECEPTION CEREMONY ',
-      imageUrl: '/pdf/4/1.jpg',
+      imageUrl: `${supabaseStorageUrl}/2.jpg`,
       videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
       originalPrice: 799,
       discountedPrice: 399,
@@ -159,19 +162,6 @@ const InvitationScroller: React.FC = () => {
               ))}
             </div>
           </div>
-        </motion.div>
-        
-        {/* Call to Action */}
-        <motion.div
-          className="mt-10 text-center"
-          variants={titleVariants}
-        >
-          <p className="dark:text-gray-400 text-black mb-6 max-w-2xl mx-auto">
-            Explore our stunning collection of digital invitations for all occasions. Customize your perfect invitation today!
-          </p>
-          <Link href="/contact" className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-3 px-6 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all hover:scale-105">
-            Create Your Custom Invitation
-          </Link>
         </motion.div>
       </motion.div>
       

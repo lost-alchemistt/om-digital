@@ -23,6 +23,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
   discountPercentage
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
   
   // Extract YouTube ID for embedding
   const getYouTubeId = (url: string) => {
@@ -39,6 +40,9 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
   const embedUrl = videoUrl ? 
     `${videoUrl}?autoplay=1&mute=1&controls=0&loop=1&playlist=${getYouTubeId(videoUrl)}` : 
     '';
+  
+  // Fallback image in case the Supabase storage URL fails
+  const fallbackImage = '/pdf/1/1.jpg';
   
   return (
     <motion.div 
@@ -85,12 +89,13 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
               />
             ) : (
               <motion.img 
-                src={imageUrl} 
+                src={imageError ? fallbackImage : imageUrl} 
                 alt={title}
                 className="w-full h-full object-cover"
                 initial={{ scale: 1 }}
                 animate={{ scale: isHovered ? 1.1 : 1 }}
                 transition={{ duration: 0.3 }}
+                onError={() => setImageError(true)}
               />
             )}
             
