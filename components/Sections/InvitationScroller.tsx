@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import InvitationCard from '../Cards/InvitationCard';
+import InvitationCard from '../Cards/ShowcaseCard';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -143,7 +143,7 @@ const InvitationScroller: React.FC = () => {
             className="view-all mt-4 sm:mt-0"
           >
             <Link 
-              href="/wedding" 
+              href="services/wedding" 
               className="text-white hover:text-purple-300 transition-colors duration-300 flex items-center gap-2 group"
             >
               <span>View All</span>
