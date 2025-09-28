@@ -1,60 +1,53 @@
 'use client'
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import InvitationCard from '../Cards/ShowcaseCard';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+
+interface WeddingCard {
+  id: number;
+  card_id: string;
+  title: string;
+  image_url: string;
+  video_url: string;
+  original_price: number;
+  discounted_price: number;
+  discount_percentage: number;
+}
 
 const InvitationScroller: React.FC = () => {
-  // Real YouTube short IDs from provided links
-  const youtubeShorts = [
-    'qn6QaXzvFcQ',
-    'knmzNWlzGg8',
-    '0IUFkh5saF4'
-  ];
+  const [invitationData, setInvitationData] = useState<WeddingCard[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Supabase storage URL prefix for your bucket and folder
-  const supabaseStorageUrl = 'https://fgwmzwguyklmonwgzxop.supabase.co/storage/v1/object/public/Photos/Wedding';
+  useEffect(() => {
+    async function fetchFeaturedCards() {
+      try {
+        // Fetch wedding cards marked as featured or just get the latest 4
+        const { data, error } = await supabase
+          .from('wedding_cards')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(4);
 
-  // Sample data for the cards using Supabase storage images
-  const invitationData = [
-    {
-      id: 'AI-1372',
-      title: 'MAYRA CEREMONY ',
-      imageUrl: `${supabaseStorageUrl}/1.jpg`,
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
-      originalPrice: 799,
-      discountedPrice: 399,
-      discountPercentage: 50
-    },
-    {
-      id: 'AI-1373',
-      title: 'WEDDING CEREMONY ',
-      imageUrl: `${supabaseStorageUrl}/3.jpg`,
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
-      originalPrice: 799,
-      discountedPrice: 399,
-      discountPercentage: 50
-    },
-    {
-      id: 'AI-1374',
-      title: 'ENGAGEMENT CEREMONY ',
-      imageUrl: `${supabaseStorageUrl}/4.jpg`,
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
-      originalPrice: 799,
-      discountedPrice: 399,
-      discountPercentage: 50
-    },
-    {
-      id: 'AI-1375',
-      title: 'RECEPTION CEREMONY ',
-      imageUrl: `${supabaseStorageUrl}/2.jpg`,
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`,
-      originalPrice: 799,
-      discountedPrice: 399,
-      discountPercentage: 50
-    },
-  ];
+        if (error) {
+          console.error('Error fetching wedding cards:', error);
+          return;
+        }
+
+        if (data) {
+          setInvitationData(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch wedding cards:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFeaturedCards();
+  }, []);
 
   // Animation variants
   const containerVariants: Variants = {
@@ -127,40 +120,42 @@ const InvitationScroller: React.FC = () => {
           className="relative"
           variants={containerVariants}
         >
-          {/* Gradient Overlays for scroll indication */}
-          {/* <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
-          <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-gray-900 to-transparent z-10"></div>
-           */}
           {/* Scrollable Cards */}
           <div className="overflow-x-auto scrollbar-hide py-4">
-            <div className="xl:inline-grid xl:grid-cols-4 xl:px-20 xl:gap-6 flex space-x-6 px-1">
-              {invitationData.map((invitation, index) => (
-                <motion.div
-                  key={`${invitation.id}-${index}`}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { 
-                      opacity: 1, 
-                      y: 0,
-                      transition: { 
-                        duration: 0.5,
-                        delay: index * 0.1
+            {loading ? (
+              <div className="flex justify-center items-center h-64 w-full">
+                <Loader2 className="w-6 h-6 text-purple-600 animate-spin" />
+              </div>
+            ) : (
+              <div className="xl:inline-grid xl:grid-cols-4 xl:px-20 xl:gap-6 flex space-x-6 px-1">
+                {invitationData.map((invitation, index) => (
+                  <motion.div
+                    key={`${invitation.card_id}-${index}`}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { 
+                        opacity: 1, 
+                        y: 0,
+                        transition: { 
+                          duration: 0.5,
+                          delay: index * 0.1
+                        }
                       }
-                    }
-                  }}
-                >
-                  <InvitationCard
-                    id={invitation.id}
-                    title={invitation.title}
-                    imageUrl={invitation.imageUrl}
-                    videoUrl={invitation.videoUrl}
-                    originalPrice={invitation.originalPrice}
-                    discountedPrice={invitation.discountedPrice}
-                    discountPercentage={invitation.discountPercentage}
-                  />
-                </motion.div>
-              ))}
-            </div>
+                    }}
+                  >
+                    <InvitationCard
+                      id={invitation.card_id}
+                      title={invitation.title}
+                      imageUrl={invitation.image_url}
+                      videoUrl={invitation.video_url}
+                      originalPrice={invitation.original_price}
+                      discountedPrice={invitation.discounted_price}
+                      discountPercentage={invitation.discount_percentage}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </motion.div>
       </motion.div>
