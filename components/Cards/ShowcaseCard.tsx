@@ -28,7 +28,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
   const getYouTubeId = (url: string) => {
     if (!url) return '';
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
-      const regex = /(?:embed\/|v=|youtu\.be\/|\/v\/|\/e\/|watch\?v=|shorts\/)([^#\&\?\s]*)/;
+      const regex = /(?:embed\/|v=|youtu\.btext-black dark:text-whitee\/|\/v\/|\/e\/|watch\?v=|shorts\/)([^#\&\?\s]*)/;
       const match = url.match(regex);
       return match && match[1] ? match[1] : '';
     }
@@ -42,19 +42,19 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
   
   return (
     <motion.div 
-      className="bg-white/10 backdrop-blur-sm rounded-lg shadow-lg p-4 w-72 sm:w-80  flex-shrink-0 border border-gray-800/30"
+      className="dark:bg-gray-800 bg-zinc-100 rounded-lg shadow-lg p-4 w-72 sm:w-80  flex-shrink-0 border border-gray-800/30"
       whileHover={{ 
         y: -5,
-        boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.15)"
+        boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.5)"
       }}
     >
       {/* Header with ID */}
-      <div className="bg-gray-800/50 text-white rounded-md px-3 py-1 text-xs font-medium mb-3 inline-block">
+      <div className="bg-gray-800/50 text-black dark:text-white rounded-md px-3 py-1 text-xs font-medium mb-3 inline-block">
         {id}
       </div>
       
       {/* Title */}
-      <h3 className="text-center text-sm font-medium text-white mb-3 uppercase tracking-wide">
+      <h3 className="text-center text-sm font-medium text-black dark:text-white mb-3 uppercase tracking-wide">
         {title}
       </h3>
       
@@ -102,7 +102,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-white fill-current">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-black dark:text-white fill-current">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </motion.div>
@@ -114,19 +114,19 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
       
       {/* Social sharing section */}
       <div className="bg-yellow-100/10 rounded-md p-2 mb-4 backdrop-blur-sm">
-        <p className="text-xs text-center text-gray-300 mb-2">Easily Send Via</p>
+        <p className="text-xs text-center text-black dark:text-white mb-2">Easily Send Via</p>
         <div className="flex justify-center space-x-4">
           <motion.div whileHover={{ scale: 1.2, color: "#1877F2" }}>
-            <Facebook className="w-5 h-5 text-gray-300 hover:text-blue-500 cursor-pointer" />
+            <Facebook className="w-5 h-5 text-black dark:text-white hover:text-blue-500 cursor-pointer" />
           </motion.div>
           <motion.div whileHover={{ scale: 1.2, color: "#E4405F" }}>
-            <Instagram className="w-5 h-5 text-gray-300 hover:text-pink-500 cursor-pointer" />
+            <Instagram className="w-5 h-5 text-black dark:text-white hover:text-pink-500 cursor-pointer" />
           </motion.div>
           <motion.div whileHover={{ scale: 1.2, color: "#25D366" }}>
-            <MessageCircle className="w-5 h-5 text-gray-300 hover:text-green-500 cursor-pointer" />
+            <MessageCircle className="w-5 h-5 text-black dark:text-white hover:text-green-500 cursor-pointer" />
           </motion.div>
           <motion.div whileHover={{ scale: 1.2 }}>
-            <Share className="w-5 h-5 text-gray-300 hover:text-white cursor-pointer" />
+            <Share className="w-5 h-5 text-black dark:text-white hover:text-black cursor-pointer" />
           </motion.div>
         </div>
       </div>
@@ -143,7 +143,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
         href={`https://wa.me/917600107620?text=Hi! I'm interested in ordering ${title} (${id})`}
         target="_blank"
         rel="noopener noreferrer"
-        className="block w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors"
+        className="block w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-black dark:text-white font-medium py-2 px-4 rounded-full text-center transition-colors"
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
       >

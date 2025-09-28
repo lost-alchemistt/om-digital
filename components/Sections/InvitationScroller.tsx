@@ -53,42 +53,6 @@ const InvitationScroller: React.FC = () => {
       discountedPrice: 399,
       discountPercentage: 50
     },
-    {
-      id: 'AI-1376',
-      title: 'HALDI CEREMONY ',
-      imageUrl: '/pdf/5/1.jpg',
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[4]}`,
-      originalPrice: 899,
-      discountedPrice: 449,
-      discountPercentage: 50
-    },
-    {
-      id: 'AI-1377',
-      title: 'MEHENDI CEREMONY ',
-      imageUrl: '/pdf/6/1.jpg',
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[0]}`, // Using first YouTube short again
-      originalPrice: 699,
-      discountedPrice: 349,
-      discountPercentage: 50
-    },
-    {
-      id: 'AI-1378',
-      title: 'SANGAM CEREMONY ',
-      imageUrl: '/pdf/7/1.jpg',
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[1]}`, // Using second YouTube short again
-      originalPrice: 799,
-      discountedPrice: 399,
-      discountPercentage: 50
-    },
-    {
-      id: 'AI-1379',
-      title: 'RING CEREMONY ',
-      imageUrl: '/pdf/8/1.jpg',
-      videoUrl: `https://www.youtube.com/embed/${youtubeShorts[2]}`, // Using third YouTube short again
-      originalPrice: 849,
-      discountedPrice: 424,
-      discountPercentage: 50
-    }
   ];
 
   // Animation variants
@@ -116,7 +80,7 @@ const InvitationScroller: React.FC = () => {
   };
 
   return (
-    <div className="w-full py-16 bg-gradient-to-b from-gray-900 to-gray-800">
+    <div className="w-full py-16 dark:bg-gray-950 bg-white">
       <motion.div 
         className="container mx-auto px-4"
         initial="hidden"
@@ -163,12 +127,12 @@ const InvitationScroller: React.FC = () => {
           variants={containerVariants}
         >
           {/* Gradient Overlays for scroll indication */}
-          <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
+          {/* <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
           <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-gray-900 to-transparent z-10"></div>
-          
+           */}
           {/* Scrollable Cards */}
           <div className="overflow-x-auto scrollbar-hide py-4">
-            <div className="flex space-x-6 pb-4" style={{ width: 'max-content' }}>
+            <div className="xl:inline-grid xl:grid-cols-4 xl:px-20 xl:gap-6 flex space-x-6 px-1">
               {invitationData.map((invitation, index) => (
                 <motion.div
                   key={`${invitation.id}-${index}`}
