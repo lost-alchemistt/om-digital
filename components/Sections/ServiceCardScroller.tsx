@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import InvitationCard from '../Cards/ShowcaseCard';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
@@ -31,15 +31,23 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
   const [cardData, setCardData] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let isMounted = true;
+    const controller = new AbortController();
 
     async function fetchFeaturedCards() {
+      if (hasAttemptedFetch) return; // Prevent duplicate fetches
+      
+      setHasAttemptedFetch(true);
+      const startTime = Date.now();
+      
       try {
         const tableName = `${serviceSlug}_cards`;
         
-        console.log(`Fetching cards for ${serviceSlug}...`);
+        console.log(`[${serviceSlug}] Starting fetch at ${new Date().toISOString()}`);
         
         const { data, error } = await supabase
           .from(tableName)
@@ -47,37 +55,44 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
           .order('created_at', { ascending: false })
           .limit(4);
 
+        const duration = Date.now() - startTime;
+        console.log(`[${serviceSlug}] Fetch completed in ${duration}ms`);
+
         if (error) {
-          console.error(`Error fetching ${serviceSlug} cards:`, error);
+          console.error(`[${serviceSlug}] Error:`, error);
           if (isMounted) {
             setError(error.message);
+            setLoading(false);
           }
           return;
         }
 
-        console.log(`Fetched ${data?.length || 0} cards for ${serviceSlug}`);
+        console.log(`[${serviceSlug}] Loaded ${data?.length || 0} cards`, data);
 
-        if (isMounted && data) {
+        if (isMounted && data && data.length > 0) {
           setCardData(data);
+          setLoading(false);
+        } else if (isMounted) {
+          setError('No cards found');
+          setLoading(false);
         }
-      } catch (err) {
-        console.error(`Failed to fetch ${serviceSlug} cards:`, err);
+      } catch (err: any) {
+        console.error(`[${serviceSlug}] Failed:`, err);
         if (isMounted) {
           setError('Failed to load cards');
-        }
-      } finally {
-        if (isMounted) {
           setLoading(false);
         }
       }
     }
 
+    // Fetch immediately on mount
     fetchFeaturedCards();
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
-  }, [serviceSlug]);
+  }, [serviceSlug]); // Removed hasAttemptedFetch from dependencies
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -116,18 +131,18 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
     );
   }
 
-  // Don't render if no cards and not loading
-  if (!loading && cardData.length === 0) {
+  // Don't render at all if error or no cards AFTER loading completes
+  if (!loading && (error || cardData.length === 0)) {
+    console.log(`[${serviceSlug}] Not rendering - error: ${error}, cards: ${cardData.length}`);
     return null;
   }
 
   return (
-    <div className="w-full py-16 dark:bg-gray-950 bg-white">
+    <div ref={sectionRef} className="w-full py-16 dark:bg-gray-950 bg-white">
       <motion.div 
         className="container mx-auto px-4"
         initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
+        animate="visible"
         variants={containerVariants}
       >
         <div className="flex flex-col sm:flex-row justify-between items-center mb-12">
@@ -138,7 +153,7 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
             <motion.div 
               className={`absolute -bottom-2 left-0 h-1 bg-gradient-to-r ${gradientColors} w-full`}
               initial={{ width: 0 }}
-              whileInView={{ width: '100%' }}
+              animate={{ width: '100%' }}
               transition={{ delay: 0.3, duration: 0.8 }}
             />
           </motion.div>
@@ -162,57 +177,53 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
           </motion.div>
         </div>
         
-        <motion.div 
-          className="relative"
-          variants={containerVariants}
-        >
-          <div className="overflow-x-auto scrollbar-hide py-4">
-            {loading ? (
-              <div className="flex flex-col justify-center items-center h-64 w-full gap-3">
-                <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Loading {serviceTitle}...
-                </p>
-              </div>
-            ) : cardData.length > 0 ? (
-              <div className="xl:grid xl:grid-cols-4 xl:px-20 xl:gap-6 flex overflow-x-auto space-x-6 px-1 pb-4">
-                {cardData.map((card, index) => (
-                  <motion.div
-                    key={`${card.card_id}-${index}`}
-                    className="flex-shrink-0"
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      visible: { 
-                        opacity: 1, 
-                        y: 0,
-                        transition: { 
-                          duration: 0.5,
-                          delay: index * 0.1
-                        }
+        <div className="relative min-h-[400px]">
+          {loading ? (
+            <div className="flex flex-col justify-center items-center h-64 w-full gap-3">
+              <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Loading {serviceTitle}...
+              </p>
+            </div>
+          ) : cardData.length > 0 ? (
+            <motion.div 
+              className="flex overflow-x-auto lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-4 snap-x snap-mandatory scrollbar-hide"
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+            >
+              {cardData.map((card, index) => (
+                <motion.div
+                  key={card.card_id}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { 
+                      opacity: 1, 
+                      y: 0,
+                      transition: { 
+                        duration: 0.5,
+                        delay: index * 0.1
                       }
-                    }}
-                  >
-                    <InvitationCard
-                      id={card.card_id}
-                      title={card.title}
-                      imageUrl={card.image_url}
-                      videoUrl={card.video_url}
-                      originalPrice={card.original_price}
-                      discountedPrice={card.discounted_price}
-                      discountPercentage={card.discount_percentage}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                No cards available for {serviceTitle}
-              </div>
-            )}
-          </div>
-        </motion.div>
+                    }
+                  }}
+                  className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-auto snap-center"
+                >
+                  <InvitationCard
+                    id={card.card_id}
+                    title={card.title}
+                    imageUrl={card.image_url}
+                    videoUrl={card.video_url}
+                    originalPrice={card.original_price}
+                    discountedPrice={card.discounted_price}
+                    discountPercentage={card.discount_percentage}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : null}
+        </div>
       </motion.div>
-      
+
       <style jsx>{`
         .scrollbar-hide {
           -ms-overflow-style: none;
