@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import InvitationCard from '../Cards/ShowcaseCard';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 
 interface Card {
@@ -30,11 +30,16 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
 }) => {
   const [cardData, setCardData] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchFeaturedCards() {
       try {
         const tableName = `${serviceSlug}_cards`;
+        
+        console.log(`Fetching cards for ${serviceSlug}...`);
         
         const { data, error } = await supabase
           .from(tableName)
@@ -44,20 +49,34 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
 
         if (error) {
           console.error(`Error fetching ${serviceSlug} cards:`, error);
+          if (isMounted) {
+            setError(error.message);
+          }
           return;
         }
 
-        if (data) {
+        console.log(`Fetched ${data?.length || 0} cards for ${serviceSlug}`);
+
+        if (isMounted && data) {
           setCardData(data);
         }
       } catch (err) {
         console.error(`Failed to fetch ${serviceSlug} cards:`, err);
+        if (isMounted) {
+          setError('Failed to load cards');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchFeaturedCards();
+
+    return () => {
+      isMounted = false;
+    };
   }, [serviceSlug]);
 
   const containerVariants: Variants = {
@@ -83,13 +102,32 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
     }
   };
 
+  // Show error state with message
+  if (!loading && error) {
+    return (
+      <div className="w-full py-8 dark:bg-gray-950 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center gap-2 text-amber-500 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+            <AlertCircle className="w-5 h-5" />
+            <p className="text-sm">Unable to load {serviceTitle}. Table may not exist yet.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if no cards and not loading
+  if (!loading && cardData.length === 0) {
+    return null;
+  }
+
   return (
     <div className="w-full py-16 dark:bg-gray-950 bg-white">
       <motion.div 
         className="container mx-auto px-4"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true }}
+        viewport={{ once: true, margin: "-100px" }}
         variants={containerVariants}
       >
         <div className="flex flex-col sm:flex-row justify-between items-center mb-12">
@@ -110,7 +148,7 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
             className="view-all mt-4 sm:mt-0"
           >
             <Link 
-              href={`services/${serviceSlug}`}
+              href={`/services/${serviceSlug}`}
               className="dark:text-white text-black hover:text-purple-300 transition-colors duration-300 flex items-center gap-2 group"
             >
               <span>View All</span>
@@ -130,14 +168,18 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
         >
           <div className="overflow-x-auto scrollbar-hide py-4">
             {loading ? (
-              <div className="flex justify-center items-center h-64 w-full">
-                <Loader2 className="w-6 h-6 text-purple-600 animate-spin" />
+              <div className="flex flex-col justify-center items-center h-64 w-full gap-3">
+                <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Loading {serviceTitle}...
+                </p>
               </div>
-            ) : (
-              <div className="xl:inline-grid xl:grid-cols-4 xl:px-20 xl:gap-6 flex space-x-6 px-1">
+            ) : cardData.length > 0 ? (
+              <div className="xl:grid xl:grid-cols-4 xl:px-20 xl:gap-6 flex overflow-x-auto space-x-6 px-1 pb-4">
                 {cardData.map((card, index) => (
                   <motion.div
                     key={`${card.card_id}-${index}`}
+                    className="flex-shrink-0"
                     variants={{
                       hidden: { opacity: 0, y: 20 },
                       visible: { 
@@ -161,6 +203,10 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
                     />
                   </motion.div>
                 ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                No cards available for {serviceTitle}
               </div>
             )}
           </div>
