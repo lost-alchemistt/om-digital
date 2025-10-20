@@ -30,12 +30,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import gsap from "gsap";
 
-interface Service {
-  id: number;
-  name: string;
-  slug: string;
-}
-
 interface NavItem {
   label: string;
   href: string;

@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import InvitationCard from '../Cards/ShowcaseCard';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
@@ -31,68 +31,56 @@ const ServiceCardScroller: React.FC<ServiceCardScrollerProps> = ({
   const [cardData, setCardData] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const hasAttemptedFetchRef = useRef(false);
+
+  const fetchFeaturedCards = useCallback(async () => {
+    if (hasAttemptedFetchRef.current) return;
+    
+    hasAttemptedFetchRef.current = true;
+    const startTime = Date.now();
+    
+    try {
+      const tableName = `${serviceSlug}_cards`;
+      
+      console.log(`[${serviceSlug}] Starting fetch at ${new Date().toISOString()}`);
+      
+      const { data, error } = await supabase
+        .from(tableName)
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(4);
+
+      const duration = Date.now() - startTime;
+      console.log(`[${serviceSlug}] Fetch completed in ${duration}ms`);
+
+      if (error) {
+        console.error(`[${serviceSlug}] Error:`, error);
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      console.log(`[${serviceSlug}] Loaded ${data?.length || 0} cards`, data);
+
+      if (data && data.length > 0) {
+        setCardData(data);
+        setLoading(false);
+      } else {
+        setError('No cards found');
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error(`[${serviceSlug}] Failed:`, err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load cards';
+      setError(errorMessage);
+      setLoading(false);
+    }
+  }, [serviceSlug]);
 
   useEffect(() => {
-    let isMounted = true;
-    const controller = new AbortController();
-
-    async function fetchFeaturedCards() {
-      if (hasAttemptedFetch) return; // Prevent duplicate fetches
-      
-      setHasAttemptedFetch(true);
-      const startTime = Date.now();
-      
-      try {
-        const tableName = `${serviceSlug}_cards`;
-        
-        console.log(`[${serviceSlug}] Starting fetch at ${new Date().toISOString()}`);
-        
-        const { data, error } = await supabase
-          .from(tableName)
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(4);
-
-        const duration = Date.now() - startTime;
-        console.log(`[${serviceSlug}] Fetch completed in ${duration}ms`);
-
-        if (error) {
-          console.error(`[${serviceSlug}] Error:`, error);
-          if (isMounted) {
-            setError(error.message);
-            setLoading(false);
-          }
-          return;
-        }
-
-        console.log(`[${serviceSlug}] Loaded ${data?.length || 0} cards`, data);
-
-        if (isMounted && data && data.length > 0) {
-          setCardData(data);
-          setLoading(false);
-        } else if (isMounted) {
-          setError('No cards found');
-          setLoading(false);
-        }
-      } catch (err: any) {
-        console.error(`[${serviceSlug}] Failed:`, err);
-        if (isMounted) {
-          setError('Failed to load cards');
-          setLoading(false);
-        }
-      }
-    }
-
-    // Fetch immediately on mount
     fetchFeaturedCards();
-
-    return () => {
-      isMounted = false;
-      controller.abort();
-    };
-  }, [serviceSlug]); // Removed hasAttemptedFetch from dependencies
+  }, [fetchFeaturedCards]);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
