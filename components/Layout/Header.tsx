@@ -27,8 +27,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-// import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase/client";
 import gsap from "gsap";
+
+interface Service {
+  id: number;
+  name: string;
+  slug: string;
+}
 
 interface NavItem {
   label: string;
@@ -36,33 +42,71 @@ interface NavItem {
   dropdownItems?: { label: string; href: string }[];
 }
 
-const navItems: NavItem[] = [
-  { label: "HOME", href: "/" },
-  {
-    label: "SERVICES",
-    href: "/services",
-    dropdownItems: [
-      { label: "Birthday", href: "/services/birthday" },
-      { label: "Wedding", href: "/services/wedding" },
-      { label: "Baby Shower", href: "/services/baby-shower" },
-      { label: "Engagement", href: "/services/engagement" },
-    ],
-  },
-  { label: "BLOG", href: "/blog" },
-  { label: "CONTACT", href: "/contact" },
-];
-
 const Header = () => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
   const [isDesktopServiceOpen, setIsDesktopServiceOpen] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
+  const [navItems, setNavItems] = useState<NavItem[]>(
+    [
+      { label: "HOME", href: "/" },
+      { label: "SERVICES", href: "/services", dropdownItems: [] },
+      { label: "BLOG", href: "/blog" },
+      { label: "CONTACT", href: "/contact" },
+    ]
+  );
+
   const headerRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuItemsRef = useRef<HTMLDivElement>(null);
   const socialLinksRef = useRef<HTMLDivElement>(null);
-  const serviceDropdownRef = useRef<HTMLLIElement>(null); // Change type to HTMLLIElement
+  const serviceDropdownRef = useRef<HTMLLIElement>(null);
+
+  // Fetch services from database
+  useEffect(() => {
+    async function fetchServices() {
+      try {
+        const { data, error } = await supabase
+          .from("services")
+          .select("id, name, slug")
+          .eq("active", true)
+          .order("id", { ascending: true });
+
+        if (error) {
+          console.error("Error fetching services:", error);
+          return;
+        }
+
+        if (data) {
+          setServices(data);
+
+          // Update navItems with dynamic services + "All Services" option
+          setNavItems([
+            { label: "HOME", href: "/" },
+            {
+              label: "SERVICES",
+              href: "/services",
+              dropdownItems: [
+                { label: "All Services", href: "/services" }, // Added this line
+                ...data.map((service) => ({
+                  label: service.name,
+                  href: `/services/${service.slug}`,
+                })),
+              ],
+            },
+            { label: "BLOG", href: "/blog" },
+            { label: "CONTACT", href: "/contact" },
+          ]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch services:", err);
+      }
+    }
+
+    fetchServices();
+  }, []);
 
   useEffect(() => {
     // Force dark mode by default
@@ -201,7 +245,7 @@ const Header = () => {
             <NavigationMenuItem
               key={item.label}
               className="relative"
-              ref={item.label === "SERVICES" ? serviceDropdownRef : undefined} // Change null to undefined
+              ref={item.label === "SERVICES" ? serviceDropdownRef : undefined}
             >
               <div
                 onClick={() => {

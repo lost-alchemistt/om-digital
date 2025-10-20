@@ -5,8 +5,9 @@ import { motion } from 'framer-motion';
 import InvitationCard from '@/components/Cards/ShowcaseCard';
 import { supabase } from '@/lib/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { notFound } from 'next/navigation';
 
-interface WeddingCard {
+interface Card {
   id: number;
   card_id: string;
   title: string;
@@ -18,37 +19,60 @@ interface WeddingCard {
   created_at: string;
 }
 
-const WeddingCardsPage = () => {
-  const [weddingCards, setWeddingCards] = useState<WeddingCard[]>([]);
+interface Service {
+  id: number;
+  name: string;
+  description: string;
+  slug: string;
+}
+
+export default function ServicePage({ params }: { params: { slug: string } }) {
+  const [cards, setCards] = useState<Card[]>([]);
+  const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchWeddingCards() {
+    async function fetchServiceAndCards() {
       try {
-        // Fetch all wedding cards from the database
-        const { data, error } = await supabase
-          .from('wedding_cards')
+        // First, fetch the service details
+        const { data: serviceData, error: serviceError } = await supabase
+          .from('services')
+          .select('*')
+          .eq('slug', params.slug)
+          .eq('active', true)
+          .single();
+
+        if (serviceError || !serviceData) {
+          notFound();
+          return;
+        }
+
+        setService(serviceData);
+
+        // Then fetch all cards for this service
+        const tableName = `${params.slug}_cards`;
+        const { data: cardsData, error: cardsError } = await supabase
+          .from(tableName)
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (error) {
-          throw new Error('Failed to fetch wedding cards');
+        if (cardsError) {
+          throw new Error(`Failed to fetch ${params.slug} cards`);
         }
 
-        setWeddingCards(data || []);
+        setCards(cardsData || []);
       } catch (err) {
-        console.error('Error fetching wedding cards:', err);
-        setError('Failed to load wedding cards. Please try again later.');
+        console.error('Error fetching data:', err);
+        setError('Failed to load cards. Please try again later.');
       } finally {
         setLoading(false);
       }
     }
 
-    fetchWeddingCards();
-  }, []);
+    fetchServiceAndCards();
+  }, [params.slug]);
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -72,7 +96,6 @@ const WeddingCardsPage = () => {
   return (
     <div className="bg-white dark:bg-gray-950 min-h-screen mt-12 py-16">
       <div className="container mx-auto px-4">
-        {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,15 +103,13 @@ const WeddingCardsPage = () => {
           className="mb-12 text-center"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-black dark:text-white mb-4">
-            Wedding Invitation Cards
+            {service?.name || 'Loading...'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Browse our complete collection of beautiful and customizable wedding invitation cards.
-            Each design can be personalized for your special day.
+            {service?.description || 'Browse our complete collection of beautiful and customizable designs.'}
           </p>
         </motion.div>
 
-        {/* Cards Display */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
@@ -105,7 +126,7 @@ const WeddingCardsPage = () => {
             initial="hidden"
             animate="visible"
           >
-            {weddingCards.map((card) => (
+            {cards.map((card) => (
               <motion.div key={card.id} variants={cardVariants}>
                 <InvitationCard
                   id={card.card_id}
@@ -121,18 +142,15 @@ const WeddingCardsPage = () => {
           </motion.div>
         )}
 
-        {/* Empty state */}
-        {!loading && !error && weddingCards.length === 0 && (
+        {!loading && !error && cards.length === 0 && (
           <div className="text-center p-12 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <h3 className="text-xl text-black dark:text-white mb-2">No cards available</h3>
             <p className="text-gray-500 dark:text-gray-400">
-              There are currently no wedding invitation cards in the database.
+              There are currently no cards in this category.
             </p>
           </div>
         )}
       </div>
     </div>
   );
-};
-
-export default WeddingCardsPage;
+}
