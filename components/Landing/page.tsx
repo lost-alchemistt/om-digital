@@ -12,7 +12,7 @@ const LandingPage = () => {
         phoneNumber="917600107620"
         message="Hi! I need help with a video invite"
         companyName="Omdigital"
-        logoUrl="/images/logo.png"
+        logoUrl="/images/logo2.png"
       />
     </div>
   );
