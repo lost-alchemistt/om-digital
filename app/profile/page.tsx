@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useTheme } from "next-themes";
+import { useToast } from "@/hooks/use-toast";
 import AnimatedBackground from "@/components/AnimatedBackground";
 
 interface UserData {
@@ -34,41 +35,10 @@ interface UserData {
   role: string;
 }
 
-// Memoize the InputField component
-const InputField = memo(function InputField({
-  name,
-  label,
-  type = "text",
-  value,
-  onChange,
-  disabled = false,
-}: {
-  name: keyof UserData;
-  label: string;
-  type?: string;
-  value: string;
-  onChange: (value: string) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={name} className="text-sm font-medium">{label}</Label>
-      <Input
-        id={name}
-        name={name}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        className="h-10"
-      />
-    </div>
-  );
-});
-
 export default function ProfilePage() {
   const { theme } = useTheme();
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<UserData>({
     first_name: "",
@@ -105,7 +75,8 @@ export default function ProfilePage() {
           setUserData(profile);
           setIsAdmin(profile.role === 'admin');
         }
-      } catch (err) {
+      } catch (error) {
+        console.error("Error fetching user data:", error);
         setError("Failed to fetch user data");
       } finally {
         setLoading(false);
@@ -127,21 +98,30 @@ export default function ProfilePage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No authenticated user");
 
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('users')
         .update({
           first_name: userData.first_name,
           last_name: userData.last_name,
           mobile: userData.mobile,
           gender: userData.gender,
-          updated_at: new Date().toISOString()
         })
         .eq('id', session.user.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+      
       setIsEditing(false);
-    } catch (err) {
-      setError("Failed to update profile");
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -152,11 +132,16 @@ export default function ProfilePage() {
     setError("");
 
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) throw signOutError;
       router.push("/");
-    } catch (err) {
-      setError("Failed to delete account");
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
       setShowDeleteDialog(false);
@@ -190,6 +175,7 @@ export default function ProfilePage() {
                 size="icon"
                 className="h-8 w-8"
                 onClick={() => router.push("/")}
+
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span className="sr-only">Back to home</span>
@@ -218,7 +204,8 @@ export default function ProfilePage() {
                   try {
                     await supabase.auth.signOut();
                     router.push("/");
-                  } catch (err) {
+                  } catch (error) {
+                    console.error("Error signing out:", error);
                     setError("Failed to sign out");
                   }
                 }}
@@ -245,7 +232,7 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-3">
                     <div>
                       <p className="text-sm font-medium">Role</p>
-                      <p className="text-base sm:text-lg font-bold">{userData.role}</p>
+                      <p className="text-base sm:text-lg font-bold capitalize">{userData.role}</p>
                     </div>
                   </div>
                 </div>
@@ -357,17 +344,16 @@ export default function ProfilePage() {
                     )}
                   </div>
                 </div>
-
                 <div className="space-y-4">
                   <div className="space-y-1.5 sm:space-y-2">
                     <Label className="text-xs sm:text-sm text-muted-foreground">Role</Label>
-                    <p className="text-base sm:text-lg font-medium">{userData.role}</p>
+                    <p className="text-base sm:text-lg font-medium capitalize">{userData.role}</p>
                   </div>
                 </div>
               </div>
-
+              
               {error && (
-                <Alert variant="destructive" className="mt-4 sm:mt-6 animate-shake">
+                <Alert variant="destructive" className="mt-4 sm:mt-6">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription className="text-sm">{error}</AlertDescription>
                 </Alert>
@@ -392,9 +378,7 @@ export default function ProfilePage() {
 
       {/* Delete Account Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent 
-          className="sm:max-w-[425px] p-4 sm:p-6"
-        >
+        <DialogContent className="sm:max-w-[425px] p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">Delete Account</DialogTitle>
             <DialogDescription className="text-sm">

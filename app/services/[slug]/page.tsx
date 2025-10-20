@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import InvitationCard from '@/components/Cards/ShowcaseCard';
 import { supabase } from '@/lib/supabase/client';
 import { Loader2 } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 
 interface Card {
   id: number;
@@ -26,7 +26,10 @@ interface Service {
   slug: string;
 }
 
-export default function ServicePage({ params }: { params: { slug: string } }) {
+export default function ServicePage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  
   const [cards, setCards] = useState<Card[]>([]);
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +42,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         const { data: serviceData, error: serviceError } = await supabase
           .from('services')
           .select('*')
-          .eq('slug', params.slug)
+          .eq('slug', slug)
           .eq('active', true)
           .single();
 
@@ -51,14 +54,14 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         setService(serviceData);
 
         // Then fetch all cards for this service
-        const tableName = `${params.slug}_cards`;
+        const tableName = `${slug}_cards`;
         const { data: cardsData, error: cardsError } = await supabase
           .from(tableName)
           .select('*')
           .order('created_at', { ascending: false });
 
         if (cardsError) {
-          throw new Error(`Failed to fetch ${params.slug} cards`);
+          throw new Error(`Failed to fetch ${slug} cards`);
         }
 
         setCards(cardsData || []);
@@ -70,8 +73,10 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
       }
     }
 
-    fetchServiceAndCards();
-  }, [params.slug]);
+    if (slug) {
+      fetchServiceAndCards();
+    }
+  }, [slug]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

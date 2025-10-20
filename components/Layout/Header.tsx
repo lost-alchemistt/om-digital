@@ -48,7 +48,6 @@ const Header = () => {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
   const [isDesktopServiceOpen, setIsDesktopServiceOpen] = useState(false);
-  const [services, setServices] = useState<Service[]>([]);
   const [navItems, setNavItems] = useState<NavItem[]>(
     [
       { label: "HOME", href: "/" },
@@ -80,8 +79,6 @@ const Header = () => {
         }
 
         if (data) {
-          setServices(data);
-
           // Update navItems with dynamic services + "All Services" option
           setNavItems([
             { label: "HOME", href: "/" },
@@ -89,7 +86,7 @@ const Header = () => {
               label: "SERVICES",
               href: "/services",
               dropdownItems: [
-                { label: "All Services", href: "/services" }, // Added this line
+                { label: "All Services", href: "/services" },
                 ...data.map((service) => ({
                   label: service.name,
                   href: `/services/${service.slug}`,

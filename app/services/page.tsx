@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { Loader2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -43,7 +43,7 @@ const AllServicesPage = () => {
     fetchServices();
   }, []);
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -54,12 +54,15 @@ const AllServicesPage = () => {
     }
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
+      transition: { 
+        duration: 0.6, 
+        ease: "easeOut" as const 
+      }
     }
   };
 
@@ -184,7 +187,7 @@ const AllServicesPage = () => {
           className="mt-16 text-center"
         >
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Can't find what you're looking for?
+            Can&apos;t find what you&apos;re looking for?
           </p>
           <Link
             href="/contact"
