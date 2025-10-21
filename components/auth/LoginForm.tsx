@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useCallback, memo, useEffect } from "react";
 import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { createClient } from '@supabase/supabase-js';
 
@@ -127,8 +127,15 @@ export default function LoginForm() {
 
       if (profileError) throw profileError;
       
-      // Profile exists, redirect to home
-      window.location.href = "/";
+      // Check for stored redirect URL
+      const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+      if (redirectUrl) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        window.location.href = redirectUrl;
+      } else {
+        // Profile exists, redirect to home
+        window.location.href = "/";
+      }
 
     } catch (error: unknown) {
       const authError = error as AuthError;

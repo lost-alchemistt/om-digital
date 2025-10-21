@@ -388,9 +388,21 @@ export default function SignupForm() {
 
       if (data.user.confirmed_at || data.session) {
 
-        // User is auto-confirmed, redirect to home
+        // Check for stored redirect URL
 
-        router.push('/');
+        const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+
+        if (redirectUrl) {
+
+          sessionStorage.removeItem('redirectAfterLogin');
+
+          router.push(redirectUrl);
+
+        } else {
+
+          router.push('/');
+
+        }
 
       } else {
 

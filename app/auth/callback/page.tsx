@@ -11,18 +11,15 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the session from the URL hash
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) throw error;
         
         if (session) {
-          // Check if this is an email verification callback
           if (session.user.email_confirmed_at) {
             setMessage("Email verified successfully! Redirecting...");
           }
 
-          // Check if user profile exists
           const { data: profile, error: profileError } = await supabase
             .from('users')
             .select('*')
@@ -30,21 +27,27 @@ export default function AuthCallback() {
             .single();
 
           if (profileError && profileError.code === 'PGRST116') {
-            // Profile doesn't exist, redirect to complete profile
             router.push('/auth/complete-profile');
             return;
           }
 
           if (profile) {
-            // Profile exists, redirect to home with a small delay for better UX
-            setTimeout(() => {
-              router.push('/');
-            }, 1000);
+            // Check for stored redirect URL
+            const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+            if (redirectUrl) {
+              sessionStorage.removeItem('redirectAfterLogin');
+              setTimeout(() => {
+                router.push(redirectUrl);
+              }, 1000);
+            } else {
+              setTimeout(() => {
+                router.push('/');
+              }, 1000);
+            }
             return;
           }
         }
 
-        // No session, redirect to login
         router.push('/auth/login');
       } catch (error) {
         console.error('Auth callback error:', error);
