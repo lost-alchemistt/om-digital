@@ -231,39 +231,25 @@ export default function SignupForm() {
 
 
   const handleGoogleSignIn = async () => {
-
     try {
-
+      // Use window.location.origin to get the current domain dynamically
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
-
         provider: 'google',
-
         options: {
-
-          redirectTo: `${window.location.origin}/auth/callback`
-
+          redirectTo: redirectUrl
         }
-
       });
 
-
-
       if (error) throw error;
-
     } catch (err) {
-
       setError(
-
         err instanceof Error
-
           ? err.message
-
           : "An error occurred with Google sign-in"
-
       );
-
     }
-
   };
 
 
@@ -330,6 +316,9 @@ export default function SignupForm() {
 
 
 
+      // Use dynamic redirect URL
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      
       // Sign up with user metadata
 
       const { data, error } = await supabase.auth.signUp({
@@ -352,7 +341,7 @@ export default function SignupForm() {
 
           },
 
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: redirectUrl,
 
         },
 

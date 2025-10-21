@@ -86,10 +86,13 @@ export default function LoginForm() {
 
   const handleGoogleSignIn = async () => {
     try {
+      // Use window.location.origin to get the current domain dynamically
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: redirectUrl
         }
       });
       if (error) throw error;
