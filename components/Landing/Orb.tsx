@@ -124,6 +124,12 @@ export default function Orb({
       vec3 color2 = adjustHue(baseColor2, hue);
       vec3 color3 = adjustHue(baseColor3, hue);
       
+      // Vertical stretching on hover - compress Y coordinate
+      float yScale = 1.0 - hover * 0.5; // Shrinks to 0.3 on full hover
+      uv.y *= yScale;
+      float xScale = 1.0 - hover * 0.3;
+      uv.x *= xScale;
+      
       float ang = atan(uv.y, uv.x);
       float len = length(uv);
       float invLen = len > 0.0 ? 1.0 / len : 0.0;
