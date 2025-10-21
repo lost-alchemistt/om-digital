@@ -330,49 +330,95 @@ export default function SignupForm() {
 
 
 
-      // Sign up process
+      // Sign up with user metadata
 
-      try {
-    // Sign up process - Pass the names in the options.data
-    const { data, error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: {
-        data: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          mobile: formData.mobile,
-          gender: formData.gender,
+      const { data, error } = await supabase.auth.signUp({
+
+        email: formData.email,
+
+        password: formData.password,
+
+        options: {
+
+          data: {
+
+            first_name: formData.firstName,
+
+            last_name: formData.lastName,
+
+            mobile: formData.mobile,
+
+            gender: formData.gender,
+
+          },
+
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+
         },
-      },
-    });
 
-    if (error) {
-      // This will catch errors like "User already registered"
-      throw error;
+      });
+
+
+
+      if (error) {
+
+        // Check if it's an email configuration error
+
+        if (error.message.includes('email') && error.message.includes('confirmation')) {
+
+          throw new Error('Email service is not configured. Please contact support or disable email confirmation in settings.');
+
+        }
+
+        throw error;
+
+      }
+
+
+
+      if (!data?.user) {
+
+        throw new Error('No user data returned after signup');
+
+      }
+
+
+
+      // Check if email confirmation is disabled (auto-confirmed)
+
+      if (data.user.confirmed_at || data.session) {
+
+        // User is auto-confirmed, redirect to home
+
+        router.push('/');
+
+      } else {
+
+        // Email confirmation required, redirect to verification page
+
+        router.push(`/auth/verify-email?email=${formData.email}`);
+
+      }
+
+    } catch (error) {
+
+      if (error instanceof Error) {
+
+        setError(error.message);
+
+      } else {
+
+        setError('An unexpected error occurred');
+
+      }
+
+      console.error('Signup error:', error);
+
+    } finally {
+
+      setLoading(false);
+
     }
-
-    if (!data?.user) {
-      throw new Error('No user data returned after signup');
-    }
-
-    // SUCCESS! The backend trigger is now creating the profile.
-    // We don't need any .insert() code here.
-
-    // Redirect to verification page
-    router.push(`/auth/verify-email?email=${formData.email}`);
-
-  } catch (error) {
-    if (error instanceof Error) {
-      setError(error.message);
-    } else {
-      setError('An unexpected error occurred');
-    }
-    console.error('Error details:', error);
-  } 
-}finally {
-    setLoading(false);
-  }
 
   };
 

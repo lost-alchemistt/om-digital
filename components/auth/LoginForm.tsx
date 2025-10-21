@@ -105,17 +105,29 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password,
       });
 
-      if (error) {
-        throw error;
+      if (error) throw error;
+
+      // Check if profile exists
+      const { error: profileError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError && profileError.code === 'PGRST116') {
+        // Profile doesn't exist, redirect to complete profile
+        window.location.href = "/auth/complete-profile";
+        return;
       }
+
+      if (profileError) throw profileError;
       
-      // If login is successful, our backend trigger has already ensured a profile exists.
-      // No need to check for it here. Just redirect.
+      // Profile exists, redirect to home
       window.location.href = "/";
 
     } catch (error: unknown) {

@@ -1,7 +1,6 @@
 "use client";
 import { Suspense } from "react";
-import LoginForm from "@/components/auth/LoginForm";
-import AuthPageGuard from "@/components/auth/AuthPageGuard";
+import VerifyEmailContent from "@/components/auth/VerifyEmailContent";
 import { Loader2 } from "lucide-react";
 
 function LoadingFallback() {
@@ -12,14 +11,10 @@ function LoadingFallback() {
   );
 }
 
-export default function LoginPage() {
+export default function VerifyEmailPage() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <AuthPageGuard>
-        <div className="flex items-center justify-center min-h-screen p-4">
-          <LoginForm />
-        </div>
-      </AuthPageGuard>
+      <VerifyEmailContent />
     </Suspense>
   );
 }
