@@ -5,18 +5,22 @@ import WhatsAppFloat from "../ui/whatsapp-float";
 import Orb from "./Orb";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 const LandingPage = () => {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
     <div className="h-full">
       <div className="md:h-[60px]"></div>
-      <div className="w-full min-h-[600px] relative flex items-center justify-center">
+      <div className="w-full min-h-[650px] relative flex items-center justify-center">
         {/* Orb Background */}
         <div className="absolute inset-0 z-0">
           <Orb
             hoverIntensity={6}
             rotateOnHover={false}
-            hue={360}
+            hue={isDark ? 360 : 260} // Purple hue for light theme, original for dark
             forceHoverState={false}
           />
         </div>
@@ -25,7 +29,7 @@ const LandingPage = () => {
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto space-y-8 pointer-events-none">
           <div className="md:h-[60px] h-[80px]"></div>
           {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight tracking-tight">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground leading-tight tracking-tight drop-shadow-lg">
             Om
             <br />
             Digital
@@ -37,7 +41,7 @@ const LandingPage = () => {
             <Link href="/services">
               <Button
                 size="lg"
-                className="bg-white/95 text-black hover:bg-white font-semibold px-10 py-6 text-base rounded-full shadow-xl hover:shadow-2xl transition-all"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-10 py-6 text-base rounded-full shadow-xl hover:shadow-2xl transition-all"
               >
                 Explore Services
               </Button>
@@ -46,7 +50,7 @@ const LandingPage = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 font-semibold px-10 py-6 text-base rounded-full backdrop-blur-sm"
+                className="border-2 font-semibold px-10 py-6 text-base rounded-full backdrop-blur-sm"
               >
                 Contact Us
               </Button>
