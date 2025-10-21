@@ -201,7 +201,7 @@ export default function Orb({
         },
         hue: { value: hue },
         hover: { value: 0 },
-        rot: { value: 0 },
+        rot: { value: -Math.PI / 2 }, // 90 degrees clockwise = -π/2 radians
         hoverIntensity: { value: hoverIntensity }
       }
     });
@@ -223,7 +223,7 @@ export default function Orb({
 
     let targetHover = 0;
     let lastTime = 0;
-    let currentRot = 0;
+    let currentRot = -Math.PI / 2; // Start at 90 degrees clockwise
     const rotationSpeed = 0.3;
 
     const handleMouseMove = (e: MouseEvent) => {

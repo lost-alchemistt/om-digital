@@ -15,7 +15,7 @@ const LandingPage = () => {
         <div className="absolute inset-0 z-0">
           <Orb
             hoverIntensity={6}
-            rotateOnHover={true}
+            rotateOnHover={false}
             hue={360}
             forceHoverState={false}
           />
