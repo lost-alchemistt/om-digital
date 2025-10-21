@@ -4,12 +4,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
+        hostname: 'fgwmzwguyklmonwgzxop.supabase.co',
+        pathname: '/storage/v1/object/public/**',
       },
-      // ...any existing remote patterns
     ],
   },
-  // ...existing config
 };
 
 module.exports = nextConfig;
